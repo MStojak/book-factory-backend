@@ -1,4 +1,4 @@
-package hr.studio_moderna.book_factory;
+package hr.sm.book_factory;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
