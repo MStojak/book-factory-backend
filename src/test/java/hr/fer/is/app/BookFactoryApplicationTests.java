@@ -1,4 +1,4 @@
-package hr.sm.book_factory;
+package hr.fer.is.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
