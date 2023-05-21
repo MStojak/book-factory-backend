@@ -1,90 +1,63 @@
 package hr.fer.is.app.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import hr.fer.is.app.util.Constants;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+import javax.persistence.Id;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serial;
+import java.util.Date;
+import java.util.UUID;
 
-/**
- * A user.
- */
-@Table(schema = "jhi_user")
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class User extends AbstractAuditingEntity<Long> implements Serializable {
+@Data
+@Entity
+@Table(name = "users")
+public class User {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
-    private Long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    private UUID id;
 
-    @NotNull
-    @Pattern(regexp = Constants.LOGIN_REGEX)
-    @Size(min = 1, max = 50)
-    private String login;
-
-    @JsonIgnore
-    @NotNull
-    @Size(min = 60, max = 60)
-    @Column(name = "password_hash")
-    private String password;
-
-    @Size(max = 50)
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Size(max = 50)
-    @Column(name = "last_name")
-    private String lastName;
-
-    @Email
-    @Size(min = 5, max = 254)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @NotNull
-    private boolean activated = false;
+    @Column(nullable = false)
+    private String passwordHash;
 
-    @Size(min = 2, max = 10)
-    @Column(name = "lang_key")
-    private String langKey;
+    @Column(nullable = false)
+    private String firstName;
 
-    @Size(max = 256)
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(nullable = false)
+    private String lastName;
 
-    @Size(max = 20)
-    @Column(name = "activation_key")
-    @JsonIgnore
-    private String activationKey;
+    private String address;
 
-    @Size(max = 20)
-    @Column(name = "reset_key")
-    @JsonIgnore
-    private String resetKey;
+    private String phone;
 
-    @Column(name = "reset_date")
-    private Instant resetDate = null;
+    private Date dateOfBirth;
 
-    @JsonIgnore
-    @Transient
-    private Set<Authority> authorities = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private UserRole role;
+
+    @Column(nullable = false)
+    private Boolean retired;
+
+    private Date dateOfEmployment;
+
+    private char gender;
 
     @Override
     public boolean equals(Object o) {
@@ -102,17 +75,4 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         return getClass().hashCode();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "login='" + login + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", activated='" + activated + '\'' +
-                ", langKey='" + langKey + '\'' +
-                ", activationKey='" + activationKey + '\'' +
-                "}";
-    }
 }

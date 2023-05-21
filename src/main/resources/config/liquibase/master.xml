@@ -1,28 +1,311 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <property name="now" value="now()" dbms="h2"/>
-    <property name="floatType" value="float4" dbms="h2"/>
-    <property name="uuidType" value="uuid" dbms="h2"/>
-    <property name="datetimeType" value="datetime" dbms="h2"/>
-    <property name="clobType" value="longvarchar" dbms="h2"/>
-    <property name="blobType" value="blob" dbms="h2"/>
-    <property name="now" value="current_timestamp" dbms="postgresql"/>
-    <property name="floatType" value="float4" dbms="postgresql"/>
-    <property name="clobType" value="longvarchar" dbms="postgresql"/>
-    <property name="blobType" value="bytea" dbms="postgresql"/>
-    <property name="uuidType" value="uuid" dbms="postgresql"/>
-    <property name="datetimeType" value="datetime" dbms="postgresql"/>
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20230519111840_added_entity_Publisher.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20230519111940_added_entity_CoverType.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20230519112040_added_entity_PrintJob.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20230519112140_added_entity_UserRole.xml" relativeToChangelogFile="false"/>
-    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
-    <include file="config/liquibase/changelog/20230519112040_added_entity_constraints_PrintJob.xml" relativeToChangelogFile="false"/>
-    <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
-    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+    <changeSet id="create-table-publisher" author="fricov">
+        <createTable tableName="publisher">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(64)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="oib" type="varchar(11)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-cover_type" author="fricov">
+        <createTable tableName="cover_type">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(24)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-print_job" author="fricov">
+        <createTable tableName="print_job">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="book_title" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="writer_name" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="publisher_id" type="bigint">
+                <constraints foreignKeyName="fk_print_job_publisher_id_publisher_id"
+                             referencedTableName="publisher"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="page_number" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cover_type_id" type="integer">
+                <constraints foreignKeyName="fk_print_job_cover_type_id_cover_type_id"
+                             referencedTableName="cover_type"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="edition_number" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="start_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deadline" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="archive" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-role" author="fricov">
+        <createTable tableName="role">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-users" author="fricov">
+        <createTable tableName="users">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(64)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password_hash" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="varchar(255)"/>
+            <column name="phone" type="varchar(20)"/>
+            <column name="date_of_birth" type="date"/>
+            <column name="role_id" type="integer">
+                <constraints foreignKeyName="fk_users_role_id_role_id"
+                             referencedTableName="role"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="retired" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_of_employment" type="date"/>
+            <column name="gender" type="char(1)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-user_created_print_job" author="fricov">
+        <createTable tableName="user_created_print_job">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="print_job_id" type="bigint">
+                <constraints foreignKeyName="fk_user_created_print_job_print_job_id_print_job_id"
+                             referencedTableName="print_job"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="is_coordinator" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints foreignKeyName="fk_user_created_print_job_user_id_users_id"
+                             referencedTableName="users"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-process" author="fricov">
+        <createTable tableName="process">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-note" author="fricov">
+        <createTable tableName="note">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="note_text" type="varchar(400)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints foreignKeyName="fk_note_user_id_users_id"
+                             referencedTableName="users"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-print_job_process" author="fricov">
+        <createTable tableName="print_job_process">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="job_id" type="bigint">
+                <constraints foreignKeyName="fk_print_job_process_job_id_print_job_id"
+                             referencedTableName="print_job"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="process_id" type="integer">
+                <constraints foreignKeyName="fk_print_job_process_process_id_process_id"
+                             referencedTableName="process"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1" author="fricov">
+        <insert tableName="cover_type">
+            <column name="name" value="Tvrdi uvez"/>
+        </insert>
+        <insert tableName="cover_type">
+            <column name="name" value="Meki uvez"/>
+        </insert>
+        <insert tableName="cover_type">
+            <column name="name" value="Tvrdi uvez s omotom"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="2" author="fricov">
+        <insert tableName="role">
+            <column name="name" value="admin"/>
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="employee"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="3" author="fricov">
+        <insert tableName="process">
+            <column name="name" value="Tisak"/>
+            <column name="description" value="Proces tiska knjiga"/>
+        </insert>
+        <insert tableName="process">
+            <column name="name" value="Knjigovežnica"/>
+            <column name="description" value="Proces pripreme knjiga za vez"/>
+        </insert>
+        <insert tableName="process">
+            <column name="name" value="Korice"/>
+            <column name="description" value="Proces izrade korica knjiga"/>
+        </insert>
+        <insert tableName="process">
+            <column name="name" value="Preša"/>
+            <column name="description" value="Proces stiskanja knjiga nakon vezivanja"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="fricov" id="insert_publisher_data">
+        <insert tableName="publisher">
+            <column name="name" value="Algoritam"/>
+            <column name="oib" value="12345678901"/>
+        </insert>
+        <insert tableName="publisher">
+            <column name="name" value="Školska Knjiga"/>
+            <column name="oib" value="12345678902"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="fricov" id="insert_data">
+        <insert tableName="print_job">
+            <column name="book_title" value="Book 1"/>
+            <column name="writer_name" value="Writer 1"/>
+            <column name="publisher_id" value="1"/>
+            <column name="page_number" value="100"/>
+            <column name="cover_type_id" value="1"/>
+            <column name="edition_number" value="1"/>
+            <column name="description" value="Description 1"/>
+            <column name="start_date" value="2023-01-01"/>
+            <column name="deadline" value="2023-02-01"/>
+            <column name="archive" value="false"/>
+        </insert>
+        <insert tableName="print_job">
+            <column name="book_title" value="Book 2"/>
+            <column name="writer_name" value="Writer 2"/>
+            <column name="publisher_id" value="1"/>
+            <column name="page_number" value="200"/>
+            <column name="cover_type_id" value="2"/>
+            <column name="edition_number" value="2"/>
+            <column name="description" value="Description 2"/>
+            <column name="start_date" value="2023-03-01"/>
+            <column name="deadline" value="2023-04-01"/>
+            <column name="archive" value="false"/>
+        </insert>
+        <insert tableName="print_job">
+            <column name="book_title" value="Book 3"/>
+            <column name="writer_name" value="Writer 3"/>
+            <column name="publisher_id" value="1"/>
+            <column name="page_number" value="150"/>
+            <column name="cover_type_id" value="1"/>
+            <column name="edition_number" value="1"/>
+            <column name="description" value="Description 3"/>
+            <column name="start_date" value="2023-05-01"/>
+            <column name="deadline" value="2023-06-01"/>
+            <column name="archive" value="false"/>
+        </insert>
+        <insert tableName="print_job">
+            <column name="book_title" value="Book 4"/>
+            <column name="writer_name" value="Writer 4"/>
+            <column name="publisher_id" value="1"/>
+            <column name="page_number" value="250"/>
+            <column name="cover_type_id" value="2"/>
+            <column name="edition_number" value="2"/>
+            <column name="description" value="Description 4"/>
+            <column name="start_date" value="2023-07-01"/>
+            <column name="deadline" value="2023-08-01"/>
+            <column name="archive" value="false"/>
+        </insert>
+        <insert tableName="print_job">
+            <column name="book_title" value="Book 5"/>
+            <column name="writer_name" value="Writer 5"/>
+            <column name="publisher_id" value="2"/>
+            <column name="page_number" value="150"/>
+            <column name="cover_type_id" value="1"/>
+            <column name="edition_number" value="1"/>
+            <column name="description" value="Description 5"/>
+            <column name="start_date" value="2023-05-01"/>
+            <column name="deadline" value="2023-06-01"/>
+            <column name="archive" value="false"/>
+        </insert>
+        <insert tableName="print_job">
+            <column name="book_title" value="Book 6"/>
+            <column name="writer_name" value="Writer 6"/>
+            <column name="publisher_id" value="2"/>
+            <column name="page_number" value="250"/>
+            <column name="cover_type_id" value="2"/>
+            <column name="edition_number" value="2"/>
+            <column name="description" value="Description 6"/>
+            <column name="start_date" value="2023-07-01"/>
+            <column name="deadline" value="2023-08-01"/>
+            <column name="archive" value="false"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

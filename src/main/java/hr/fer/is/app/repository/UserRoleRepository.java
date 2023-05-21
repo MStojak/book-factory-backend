@@ -1,42 +1,10 @@
 package hr.fer.is.app.repository;
 
 import hr.fer.is.app.domain.UserRole;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-/**
- * Spring Data R2DBC repository for the UserRole entity.
- */
-@SuppressWarnings("unused")
 @Repository
-public interface UserRoleRepository extends ReactiveCrudRepository<UserRole, Long>, UserRoleRepositoryInternal {
-    Flux<UserRole> findAllBy(Pageable pageable);
-
-    @Override
-    <S extends UserRole> Mono<S> save(S entity);
-
-    @Override
-    Flux<UserRole> findAll();
-
-    @Override
-    Mono<UserRole> findById(Long id);
-
-    @Override
-    Mono<Void> deleteById(Long id);
-}
-
-interface UserRoleRepositoryInternal {
-    <S extends UserRole> Mono<S> save(S entity);
-
-    Flux<UserRole> findAllBy(Pageable pageable);
-
-    Flux<UserRole> findAll();
-
-    Mono<UserRole> findById(Long id);
-    // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
-    // Flux<UserRole> findAllBy(Pageable pageable, Criteria criteria);
+public interface UserRoleRepository extends JpaRepository<UserRole, Integer> {
 
 }

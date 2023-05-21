@@ -1,34 +1,28 @@
 package hr.fer.is.app.domain;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
+import lombok.Data;
+import javax.persistence.Id;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Table;
 import java.io.Serializable;
 
-/**
- * A UserRole.
- */
-@Table(schema = "user_role")
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
+@Data
+@Entity
+@Table(name = "role")
+
 public class UserRole implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @NotNull(message = "must not be null")
-    @Column(name = "name")
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Override
@@ -44,16 +38,7 @@ public class UserRole implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "UserRole{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            "}";
-    }
 }

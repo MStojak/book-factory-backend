@@ -1,77 +1,72 @@
 package hr.fer.is.app.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+import lombok.Data;
+import javax.persistence.Id;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.LocalDate;
+import java.util.Date;
 
-/**
- * A PrintJob.
- */
-@Table
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class PrintJob  {
-
+@Data
+@Entity
+@Table(name = "print_job")
+public class PrintJob {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "must not be null")
-    @Column(name = "book_title")
+    @Column(nullable = false)
     private String bookTitle;
 
-    @NotNull(message = "must not be null")
-    @Column(name = "writer_name")
+    @Column(nullable = false)
     private String writerName;
 
-    @NotNull(message = "must not be null")
-    @Column(name = "page_number")
-    private Integer pageNumber;
-
-    @NotNull(message = "must not be null")
-    @Column(name = "edition_number")
-    private Integer editionNumber;
-
-    @Column(name = "description")
-    private String description;
-
-    @NotNull(message = "must not be null")
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
-    @NotNull(message = "must not be null")
-    @Column(name = "deadline")
-    private LocalDate deadline;
-
-    @NotNull(message = "must not be null")
-    @Column(name = "archive")
-    private Boolean archive;
-
-    @Transient
-    @JsonIgnoreProperties(value = { "printJobs" }, allowSetters = true)
+    @ManyToOne
+    @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
 
-    @Transient
-    @JsonIgnoreProperties(value = { "printJobs" }, allowSetters = true)
+    @Column(nullable = false)
+    private Integer pageNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "cover_type_id", nullable = false)
     private CoverType coverType;
 
-    @Column(name = "publisher_id")
-    private Long publisherId;
+    @Column(nullable = false)
+    private Integer editionNumber;
 
-    @Column(name = "cover_type_id")
-    private Long coverTypeId;
+    private String description;
+
+    @Column(nullable = false)
+    private Date startDate;
+
+    @Column(nullable = false)
+    private Date deadline;
+
+    @Column(nullable = false)
+    private Boolean archive;
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final PrintJob printJob = (PrintJob) o;
+
+        return id.equals(printJob.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
 }

@@ -1,24 +1,12 @@
 package hr.fer.is.app.domain.dto;
 
-import hr.fer.is.app.domain.UserRole;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- * A DTO for the {@link UserRole} entity.
- */
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder
+@Data
 public class UserRoleDTO implements Serializable {
 
     private Long id;

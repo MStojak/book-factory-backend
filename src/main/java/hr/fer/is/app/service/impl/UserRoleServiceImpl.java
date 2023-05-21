@@ -13,17 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Service Implementation for managing {@link UserRole}.
- */
+import javax.persistence.EntityNotFoundException;
+
 @Service
-@Transactional
 public class UserRoleServiceImpl implements UserRoleService {
 
-    private final Logger log = LoggerFactory.getLogger(UserRoleServiceImpl.class);
-
     private final UserRoleRepository userRoleRepository;
-
     private final UserRoleMapper userRoleMapper;
 
     public UserRoleServiceImpl(UserRoleRepository userRoleRepository, UserRoleMapper userRoleMapper) {
@@ -32,53 +27,40 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public Mono<UserRoleDTO> save(UserRoleDTO userRoleDTO) {
-        log.debug("Request to save UserRole : {}", userRoleDTO);
-        return userRoleRepository.save(userRoleMapper.toEntity(userRoleDTO)).map(userRoleMapper::toDto);
+    public UserRoleDTO getById(Integer id) {
+        return userRoleRepository.findById(id)
+                .map(userRoleMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("UserRole not found"));
     }
 
     @Override
-    public Mono<UserRoleDTO> update(UserRoleDTO userRoleDTO) {
-        log.debug("Request to update UserRole : {}", userRoleDTO);
-        return userRoleRepository.save(userRoleMapper.toEntity(userRoleDTO)).map(userRoleMapper::toDto);
+    public UserRole getRawById(Integer id) {
+        return userRoleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("UserRole not found"));
     }
 
     @Override
-    public Mono<UserRoleDTO> partialUpdate(UserRoleDTO userRoleDTO) {
-        log.debug("Request to partially update UserRole : {}", userRoleDTO);
-
-        return userRoleRepository
-            .findById(userRoleDTO.getId())
-            .map(existingUserRole -> {
-                userRoleMapper.partialUpdate(existingUserRole, userRoleDTO);
-
-                return existingUserRole;
-            })
-            .flatMap(userRoleRepository::save)
-            .map(userRoleMapper::toDto);
+    public UserRoleDTO create(UserRoleDTO userRoleDTO) {
+        UserRole userRole = userRoleMapper.toEntity(userRoleDTO);
+        UserRole savedUserRole = userRoleRepository.save(userRole);
+        return userRoleMapper.toDto(savedUserRole);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Flux<UserRoleDTO> findAll(Pageable pageable) {
-        log.debug("Request to get all UserRoles");
-        return userRoleRepository.findAllBy(pageable).map(userRoleMapper::toDto);
-    }
+    public UserRoleDTO update(Integer id, UserRoleDTO userRoleDTO) {
+        UserRole existingUserRole = userRoleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("UserRole not found"));
 
-    public Mono<Long> countAll() {
-        return userRoleRepository.count();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Mono<UserRoleDTO> findOne(Long id) {
-        log.debug("Request to get UserRole : {}", id);
-        return userRoleRepository.findById(id).map(userRoleMapper::toDto);
+        userRoleMapper.updateEntityFromDto(userRoleDTO, existingUserRole);
+        UserRole updatedUserRole = userRoleRepository.save(existingUserRole);
+        return userRoleMapper.toDto(updatedUserRole);
     }
 
     @Override
-    public Mono<Void> delete(Long id) {
-        log.debug("Request to delete UserRole : {}", id);
-        return userRoleRepository.deleteById(id);
+    public void delete(Integer id) {
+        if (!userRoleRepository.existsById(id)) {
+            throw new EntityNotFoundException("UserRole not found");
+        }
+        userRoleRepository.deleteById(id);
     }
 }
